@@ -136,10 +136,6 @@
                             <createDependencyReducedPom>false</createDependencyReducedPom>
                             <relocations>
                                 <relocation>
-                                    <pattern>org.sqlite</pattern>
-                                    <shadedPattern>com.skooper.sentinelac.libs.sqlite</shadedPattern>
-                                </relocation>
-                                <relocation>
                                     <pattern>org.apache.commons.math3</pattern>
                                     <shadedPattern>com.skooper.sentinelac.libs.math3</shadedPattern>
                                 </relocation>

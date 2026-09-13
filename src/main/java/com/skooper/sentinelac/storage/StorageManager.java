@@ -24,6 +24,9 @@ public final class StorageManager implements AutoCloseable {
     private Connection connection;
 
     public StorageManager(File dbFile, Logger logger) {
+        if (dbFile.getParentFile() != null && !dbFile.getParentFile().exists()) {
+            dbFile.getParentFile().mkdirs();
+        }
         this.dbUrl = "jdbc:sqlite:" + dbFile.getAbsolutePath();
         this.logger = logger != null ? logger : Logger.getLogger(StorageManager.class.getName());
         initDatabase();
@@ -37,8 +40,7 @@ public final class StorageManager implements AutoCloseable {
 
     private synchronized void initDatabase() {
         try {
-            Class.forName("org.sqlite.JDBC");
-            this.connection = DriverManager.getConnection(dbUrl);
+            this.connection = createNewConnection();
 
             try (Statement stmt = connection.createStatement()) {
                 stmt.execute("""
@@ -69,9 +71,15 @@ public final class StorageManager implements AutoCloseable {
         }
     }
 
+    private Connection createNewConnection() throws SQLException {
+        org.sqlite.SQLiteDataSource ds = new org.sqlite.SQLiteDataSource();
+        ds.setUrl(dbUrl);
+        return ds.getConnection();
+    }
+
     private synchronized Connection getConnection() throws SQLException {
         if (connection == null || connection.isClosed()) {
-            connection = DriverManager.getConnection(dbUrl);
+            connection = createNewConnection();
         }
         return connection;
     }
