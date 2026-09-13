@@ -27,4 +27,21 @@
   - Standard epsilon tolerance configured to 0.005 blocks to accommodate client-server floating-point rounding.
   - Grace window defaults to 10–15 ticks on velocity change and teleport to prevent false flags on knockback or server teleportation.
 - **What's next:**
-  - Phase 2: Combat Engine (`combat` package) — server-authoritative raycast + lag-compensated hit validation (3D ray-AABB intersection test, maximum reach enforcement, and synthetic geometry unit tests).
+  - Phase 2: Combat Engine.
+
+## Phase 2 — Combat Engine
+- **Status:** COMPLETED
+- **What was built:**
+  - `com.skooper.sentinelac.combat.model`: `Ray3D` (origin from eye coordinates, normalized directional look vector from yaw/pitch), `BoundingBox3D` (3D AABB with Kay-Kajiya / Williams slab intersection algorithm returning exact distance or miss), `HistoricalEntityState` (per-tick entity hitbox snapshots), and `CombatViolation` (verdicts: `NONE`, `IMPOSSIBLE_HIT_NO_INTERSECTION`, `REACH_EXCEEDED`).
+  - `com.skooper.sentinelac.combat.engine`: `LagCompensator` (stores rolling 40-tick history of entity hitboxes, rewinds to exact ping latency tick) and `CombatEngine` (deterministic geometric ray-AABB hit validation, configurable survival/creative reach caps, hitbox expansion).
+  - `com.skooper.sentinelac.combat.listener`: `CombatListener` Paper event listener for `EntityDamageByEntityEvent`, `PlayerMoveEvent`, entity death and disconnect cleanup.
+  - Comprehensive unit tests in `CombatEngineTest`: synthetic geometry test cases verifying clear hits, 90-degree misses, edge-grazing hits (inside vs outside box edge), hits at exact max reach limit (3.00m), hits beyond limit (3.05m), creative mode reach, and lag-compensated hitbox rewinding.
+- **Assumptions made:**
+  - Base survival reach default set to 3.00 blocks with 0.05m tolerance; creative reach default set to 5.00 blocks.
+  - Lag compensation bounded to a maximum of 20 ticks (1000ms ping) to prevent historical exploitation from artificial lag spiking.
+- **What's next:**
+  - Phase 3: Behavior Engine (`behavior` package) — statistical/control-theory analysis of clicks and aim:
+    - Click-timing analysis: rolling window log-normal distribution fit, Kolmogorov–Smirnov test, and coefficient of variation (stddev/mean).
+    - Aim-response analysis: yaw/pitch deltas modeled as damped PID convergence with ~150ms biological reaction floor, calculating residual.
+    - Periodicity analysis: FFT / autocorrelation over click-timing and yaw-delta time series detecting spectral peaks indicative of macros/autoclickers.
+    - Synthetic legit vs cheat unit tests.
