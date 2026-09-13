@@ -95,4 +95,15 @@
   - Database stores flags and verdicts in `plugins/SentinelAC/sentinelac.db`.
   - Discord webhook alerts are disabled by default to prevent failed requests until user supplies a valid webhook URL.
 - **What's next:**
-  - Phase 6: Finalization — complete user-facing `README.md` (Section 8 spec), finalize `PROGRESS.md`, verify CI build and tests, and tag git release `v1.0.0`.
+  - Phase 6: Finalization.
+
+## Phase 6 — Finalization & Release
+- **Status:** COMPLETED
+- **What was built:**
+  - `README.md`: Complete production guide covering architecture overview, shaded jar acquisition, step-by-step installation instructions with exact console log lines, end-to-end testing scenarios (fly, reach, autoclicker), full command and permission references, config option explanations, explicit "Known Limitations" disclosure, and future roadmap.
+  - Verification of test suite: 23 unit and integration tests covering movement physics, geometric ray-AABB intersection, lag compensation rewind, log-normal click fitting, KS test, damped neuromuscular aim response, FFT spectral periodicity, Wald SPRT boundary calculations, trajectory accumulation, deterministic shortcuts, lower boundary resets, simulated player session smoke tests, and SQLite persistence across restarts.
+  - Release tagging: tagged `v1.0.0` in git and synced with GitHub remote.
+- **Assumptions made:**
+  - Initial stable release tagged as `v1.0.0` matching Maven project specification.
+- **What's next:**
+  - Project build complete. Ready for production deployment and server-specific threshold calibration.
