@@ -59,4 +59,25 @@
   - Minimum 10 inter-click intervals required for statistical distribution fitting; minimum 16 samples for spectral FFT evaluation.
   - Biological reaction-time floor set to 150ms based on human neuromuscular limits.
 - **What's next:**
-  - Phase 4: Fusion Engine (`fusion` package) — Sequential Probability Ratio Test (SPRT) combining evidence from Phases 1–3 into calibrated per-player confidence scores $\Lambda$, Wald boundaries $\ln((1-\beta)/\alpha)$ and $\ln(\beta/(1-\alpha))$, shortcutting deterministic proofs, and end-to-end smoke test.
+  - Phase 4: Fusion Engine.
+
+## Phase 4 — Fusion Engine
+- **Status:** COMPLETED
+- **What was built:**
+  - `com.skooper.sentinelac.fusion.model`: `CheatCategory` (`MOVEMENT`, `COMBAT`, `AIM`, `CLICK`), `SprtBoundary` deriving Wald decision boundaries $A = \ln((1-\beta)/\alpha)$ and $B = \ln(\beta/(1-\alpha))$, `EvidenceRecord`, `PlayerFusionProfile` (managing per-player $\Lambda$ values, flag states, and history), and `FusionFlagEvent`.
+  - `com.skooper.sentinelac.fusion.engine`: `FusionEngine` executing Sequential Probability Ratio Test (SPRT) evidence fusion across all modules. Provides calibrated confidence accumulation, automatic clearing/resetting at lower boundary $B$, immediate auto-flagging at upper boundary $A$, and deterministic violation shortcutting for proofs from Movement/Combat engines.
+  - Unit tests in `FusionEngineTest`:
+    - Wald boundary formulas mathematically validated against hand-computed values across $(\alpha=0.001, \beta=0.01)$ and $(\alpha=0.01, \beta=0.05)$.
+    - Fixed evidence trajectory sequence testing asserting exact numerical precision.
+    - Deterministic violation shortcutting test verifying immediate jump to upper threshold $A$.
+    - Lower boundary reset test clearing evidence when $\Lambda \le B$.
+    - End-to-end simulated player session smoke test demonstrating zero false positives during legitimate play and rapid flagging upon autoclicker and speed-hack injection.
+- **Assumptions made:**
+  - Default target false positive rate $\alpha = 0.001$ (0.1%) and false negative rate $\beta = 0.010$ (1.0%), yielding upper boundary $A \approx 6.898$ and lower boundary $B \approx -4.604$.
+  - Deterministic proofs shortcut directly to $A$, while behavioral signals accumulate stochastically.
+- **What's next:**
+  - Phase 5: Persistence, Reporting, Commands & Configuration (`storage` + `reporting` packages, command handlers, `config.yml`):
+    - SQLite database schema (`flags`, `verdicts`).
+    - Staff commands: `/sentinelac status <player>`, `/sentinelac flagged`, `/sentinelac verdict <flagId> <upheld|overturned>`, `/sentinelac reload`.
+    - Config-gated Discord webhook alerting system.
+    - Configuration file `config.yml` with full parameterization.
