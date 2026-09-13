@@ -1,0 +1,17 @@
+name: SentinelAC
+version: '${project.version}'
+main: com.skooper.sentinelac.SentinelAC
+api-version: '1.20'
+author: Skooper
+description: Production-quality server-authoritative Minecraft Anti-Cheat plugin for PaperMC
+
+commands:
+  sentinelac:
+    description: Primary management command for SentinelAC
+    permission: sentinelac.admin
+    usage: /sentinelac <status|flagged|verdict|reload> [args...]
+
+permissions:
+  sentinelac.admin:
+    description: Allows administrative access to SentinelAC commands and alerts
+    default: op
