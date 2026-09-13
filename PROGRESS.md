@@ -40,8 +40,23 @@
   - Base survival reach default set to 3.00 blocks with 0.05m tolerance; creative reach default set to 5.00 blocks.
   - Lag compensation bounded to a maximum of 20 ticks (1000ms ping) to prevent historical exploitation from artificial lag spiking.
 - **What's next:**
-  - Phase 3: Behavior Engine (`behavior` package) — statistical/control-theory analysis of clicks and aim:
-    - Click-timing analysis: rolling window log-normal distribution fit, Kolmogorov–Smirnov test, and coefficient of variation (stddev/mean).
-    - Aim-response analysis: yaw/pitch deltas modeled as damped PID convergence with ~150ms biological reaction floor, calculating residual.
-    - Periodicity analysis: FFT / autocorrelation over click-timing and yaw-delta time series detecting spectral peaks indicative of macros/autoclickers.
-    - Synthetic legit vs cheat unit tests.
+  - Phase 3: Behavior Engine.
+
+## Phase 3 — Behavior Engine
+- **Status:** COMPLETED
+- **What was built:**
+  - `com.skooper.sentinelac.behavior.model`: `ClickSample`, `AimSample`, `PlayerEvidenceWindow`, and `BehaviorScore` (quantitative log-likelihood-ratio contributions).
+  - `com.skooper.sentinelac.behavior.analysis`:
+    - `ClickTimingAnalysis`: inter-click interval analysis, coefficient of variation (CV), log-normal distribution fitting, and two-sample Kolmogorov–Smirnov goodness-of-fit test.
+    - `AimResponseAnalysis`: neuromuscular control-theory modeling (critically damped 2nd order convergence curve), biological reaction-time floor (150ms), residual calculation, and angular micro-tremor detection.
+    - `PeriodicityAnalysis`: FFT power spectrum analysis (SPAR), normalized lag autocorrelation, detecting periodic macros/autoclickers without signatures.
+  - `com.skooper.sentinelac.behavior.scorer`:
+    - `BehaviorScorer`: future-proof pluggable scoring interface enabling seamless machine-learning integration.
+    - `RuleBasedBehaviorScorer`: production rule-based implementation combining all three behavioral analyzers.
+  - `com.skooper.sentinelac.behavior.listener`: `BehaviorListener` tracking arm swings, rotation deltas, nearest-target angular deviation, and window evaluations.
+  - Unit tests in `BehaviorEngineTest`: synthetic tests verifying human vs bot click distributions, human damping vs superhuman snap aimbots, stochastic white noise vs periodic square-wave macros, and end-to-end window scoring.
+- **Assumptions made:**
+  - Minimum 10 inter-click intervals required for statistical distribution fitting; minimum 16 samples for spectral FFT evaluation.
+  - Biological reaction-time floor set to 150ms based on human neuromuscular limits.
+- **What's next:**
+  - Phase 4: Fusion Engine (`fusion` package) — Sequential Probability Ratio Test (SPRT) combining evidence from Phases 1–3 into calibrated per-player confidence scores $\Lambda$, Wald boundaries $\ln((1-\beta)/\alpha)$ and $\ln(\beta/(1-\alpha))$, shortcutting deterministic proofs, and end-to-end smoke test.
