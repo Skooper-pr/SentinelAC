@@ -13,4 +13,18 @@
   - Targeted PaperMC API `1.20.4-R0.1-SNAPSHOT` as stable release baseline.
   - Relocated shaded runtime libraries (`org.sqlite` -> `com.skooper.sentinelac.libs.sqlite`, `org.apache.commons.math3` -> `com.skooper.sentinelac.libs.math3`) to prevent classpath conflicts with other Paper plugins.
 - **What's next:**
-  - Phase 1: Movement Engine — deterministic Minecraft physics replication, tick simulation across medium types (air, water, lava, ice, slime, honey, cobweb, elytra), delta comparison against client reports with grace window, and comprehensive unit tests.
+  - Phase 1: Movement Engine.
+
+## Phase 1 — Movement Engine
+- **Status:** COMPLETED
+- **What was built:**
+  - `com.skooper.sentinelac.movement.model`: `Vector3D` immutable 3D vector, `PlayerInput` tick controls, `MovementMedium` (air, water, lava, cobweb, elytra), `BlockFriction` (normal, ice, packed ice, blue ice, slime, honey, soul sand), `EnvironmentState`, and `PlayerPhysicsState`.
+  - `com.skooper.sentinelac.movement.simulator`: `PhysicsConstants` and `PhysicsSimulator` replicating per-tick vanilla physics: gravity (0.08 blocks/tick² in air, 0.02 in water/lava), vertical drag (0.98 air, 0.80 water, 0.50 lava), horizontal inertia (0.91 air, 0.80 water, 0.50 lava, block slipperiness scaled), jump impulse (0.42) with sprint boost (0.20), slime rebound, honey fall caps, cobweb resistance, and pitch-dependent elytra gliding.
+  - `com.skooper.sentinelac.movement.check`: `MovementCheck` and `MovementViolation` calculating spatial deltas against epsilon tolerance, managing per-player states, and absorbing network lag/velocity via configurable grace windows.
+  - `com.skooper.sentinelac.movement.listener`: `MovementListener` integrating Paper events (`PlayerMoveEvent`, `PlayerTeleportEvent`, `PlayerVelocityEvent`, `PlayerJoinEvent`, `PlayerQuitEvent`).
+  - Unit tests in `MovementPhysicsTest` covering jumping, sprint-jumping, water drag, ice sliding, elytra glide, cobweb damping, and delta violation thresholds.
+- **Assumptions made:**
+  - Standard epsilon tolerance configured to 0.005 blocks to accommodate client-server floating-point rounding.
+  - Grace window defaults to 10–15 ticks on velocity change and teleport to prevent false flags on knockback or server teleportation.
+- **What's next:**
+  - Phase 2: Combat Engine (`combat` package) — server-authoritative raycast + lag-compensated hit validation (3D ray-AABB intersection test, maximum reach enforcement, and synthetic geometry unit tests).
