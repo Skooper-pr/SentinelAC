@@ -1,0 +1,45 @@
+# ==============================================================================
+#                      SentinelAC Anti-Cheat Configuration
+# ==============================================================================
+
+# --- Check Toggles ---
+checks:
+  movement:
+    enabled: true
+    epsilon: 0.005              # Floating-point delta tolerance (blocks/tick)
+    default_grace_ticks: 10     # Ticks to absorb network lag/teleports/knockback
+
+  combat:
+    enabled: true
+    survival_reach: 3.00        # Maximum legal attack distance in Survival/Adventure (blocks)
+    creative_reach: 5.00        # Maximum legal attack distance in Creative mode (blocks)
+    reach_tolerance: 0.05       # Reach rounding tolerance (blocks)
+    hitbox_expansion: 0.10      # Server-side AABB expansion for client latency (blocks)
+    cancel_violations: false    # If true, directly cancel damage events that violate checks
+
+  behavior:
+    click_timing:
+      enabled: true             # Log-normal distribution & CV variance check
+    aim_response:
+      enabled: true             # Damped neuromuscular model & biological reaction-time floor
+    periodicity:
+      enabled: true             # Fast Fourier Transform (FFT) & Autocorrelation macro check
+
+# --- Fusion Engine (SPRT) Parameters ---
+fusion:
+  # Wald SPRT target error boundaries:
+  # Upper flag boundary A = ln((1 - beta) / alpha)
+  # Lower reset boundary B = ln(beta / (1 - alpha))
+  alpha: 0.001                  # Target False Positive Rate (0.1% -> Upper boundary ~6.898)
+  beta: 0.010                   # Target False Negative Rate (1.0% -> Lower boundary ~-4.604)
+
+# --- Alerting & Webhooks ---
+alerts:
+  in_game_broadcast: true       # Broadcast detection flags to staff with sentinelac.admin
+  discord:
+    enabled: false              # Disabled by default (free, pure Java standard HttpClient)
+    webhook_url: ""             # Paste your Discord channel webhook URL here
+
+# --- Logging & Verbosity ---
+logging:
+  verbosity: INFO               # Log verbosity level: DEBUG, INFO, WARN, SEVERE

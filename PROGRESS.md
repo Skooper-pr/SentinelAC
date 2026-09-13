@@ -76,8 +76,23 @@
   - Default target false positive rate $\alpha = 0.001$ (0.1%) and false negative rate $\beta = 0.010$ (1.0%), yielding upper boundary $A \approx 6.898$ and lower boundary $B \approx -4.604$.
   - Deterministic proofs shortcut directly to $A$, while behavioral signals accumulate stochastically.
 - **What's next:**
-  - Phase 5: Persistence, Reporting, Commands & Configuration (`storage` + `reporting` packages, command handlers, `config.yml`):
-    - SQLite database schema (`flags`, `verdicts`).
-    - Staff commands: `/sentinelac status <player>`, `/sentinelac flagged`, `/sentinelac verdict <flagId> <upheld|overturned>`, `/sentinelac reload`.
-    - Config-gated Discord webhook alerting system.
-    - Configuration file `config.yml` with full parameterization.
+  - Phase 5: Persistence, Reporting, Commands & Configuration.
+
+## Phase 5 — Persistence, Reporting, Commands & Configuration
+- **Status:** COMPLETED
+- **What was built:**
+  - `com.skooper.sentinelac.storage`:
+    - `FlagRecord` and `VerdictRecord` data models.
+    - `StorageManager`: Pure Java SQLite connection and schema creation (`flags` and `verdicts` tables, foreign keys, index structures). Staff verdicts table implemented as ground-truth training data for future machine learning.
+  - `com.skooper.sentinelac.reporting`:
+    - `DiscordWebhookNotifier`: Asynchronous Discord alert dispatcher utilizing pure Java `HttpClient` with rich embed formatting, config-gated and disabled by default.
+  - `com.skooper.sentinelac.command`:
+    - `SentinelCommand`: Staff command handler and tab completer supporting `/sentinelac status <player>`, `/sentinelac flagged`, `/sentinelac verdict <flagId> <upheld|overturned>`, and `/sentinelac reload`.
+  - `src/main/resources/config.yml`: Production configuration file documenting all check toggles, SPRT error rates, movement epsilons, grace windows, survival/creative reach caps, webhook alerting, and logging.
+  - `SentinelAC.java`: Main plugin orchestrator wiring all 6 modules, registering event listeners, scheduling lag compensator ticks, and binding command executors.
+  - `StorageManagerTest`: Unit test confirming persistent storage and query of flags and verdicts across database shutdown and restart.
+- **Assumptions made:**
+  - Database stores flags and verdicts in `plugins/SentinelAC/sentinelac.db`.
+  - Discord webhook alerts are disabled by default to prevent failed requests until user supplies a valid webhook URL.
+- **What's next:**
+  - Phase 6: Finalization — complete user-facing `README.md` (Section 8 spec), finalize `PROGRESS.md`, verify CI build and tests, and tag git release `v1.0.0`.
